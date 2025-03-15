@@ -1,0 +1,116 @@
+opt:
+  debug: false
+  demo: false
+  device: cuda:1
+  fp16: true
+  gpus: 1
+  id: default
+  log_step: 1
+  nepochs: 30
+  num_iters: -1
+  num_workers: 4
+  pretrained: null
+  resume: false
+  save_dir: runs
+  seed: 123
+  test: false
+  val_step: 1
+  verbose: true
+pipeline:
+  criterion:
+    args: {}
+    name: ClassificationCELoss
+  data:
+    dataset:
+      train:
+        args:
+          num_classes: 13
+          annotation_file: train_annotations.csv
+          root_dir: /data/danh/vehicle_classification/vehicles_class_data
+        name: TRUCKCLASSIFICATIONDATASET
+      val:
+        args:
+          num_classes: 13
+          annotation_file: valid_annotations.csv
+          root_dir: /data/danh/vehicle_classification/vehicles_class_data
+        name: TRUCKCLASSIFICATIONDATASET
+    loader:
+      train:
+        args:
+          batch_size: 256
+          drop_last: true
+          shuffle: true
+        name: DataLoader
+      val:
+        args:
+          batch_size: 256
+          drop_last: false
+          shuffle: false
+        name: DataLoader
+    splits:
+      train: 0.6
+      val: 0.4
+  device:
+    args:
+      default: cuda
+    name: get_device
+  metric:
+  - args: 
+    name: ClassificationAccuracy
+  model:
+    args: 
+      image_size: 128
+      num_classes: 13
+    name: mobilevit_xs
+  optimizer:
+    args:
+      lr: 0.0001
+    name: Adam
+  scheduler:
+    args:
+      gamma: 0.2
+      last_epoch: -1
+      step_size: 3
+    name: StepLR
+  trainer:
+    args: {}
+    name: SupervisedTrainer
+transform:
+  train:
+    args:
+      transforms:
+      - args:
+          height: 128
+          width: 128
+        name: AlbResize
+      - args:
+          mean:
+          - 0.5
+          - 0.5
+          - 0.5
+          std:
+          - 0.5
+          - 0.5
+          - 0.5
+        name: AlbNormalize
+      - name: AlbToTensorV2
+    name: AlbCompose
+  val:
+    args:
+      transforms:
+      - args:
+          height: 128
+          width: 128
+        name: AlbResize
+      - args:
+          mean:
+          - 0.5
+          - 0.5
+          - 0.5
+          std:
+          - 0.5
+          - 0.5
+          - 0.5
+        name: AlbNormalize
+      - name: AlbToTensorV2
+    name: AlbCompose
