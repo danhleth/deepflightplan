@@ -1,0 +1,19 @@
+opt:
+  save_dir: runs
+  seed: 123
+
+data:
+  datasource:
+    args:
+      file_path: /home/danhle/AIATFM/data_preparation/deepflightplan/datasets/lido21/enroute_airway.geojson
+    name: Lido21EnrouteAirwayDataset
+  od_dataset:
+    args:
+      file_path: /home/danhle/AIATFM/data_preparation/deepflightplan/datasets/od_pair/od_pair.csv
+    name: ODAirportDataset
+
+criterion:
+  name: GeopyGreatCircleDistance
+
+algorithm:
+    name: nxAstar

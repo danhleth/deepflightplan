@@ -1,5 +1,4 @@
-from dioscuri.base.registry import Registry
-
+from dioscuri.registry import Registry
 
 def get_instance(config, registry: Registry, **kwargs):
     # ref https://github.com/vltanh/torchan/blob/master/torchan/utils/getter.py
@@ -39,12 +38,3 @@ def get_instance_recursively(config, registry: Registry, **kwargs):
 def get_function(name):
     return globals()[name]
 
-
-def get_dataloader(cfg, dataset):
-    from torch.utils.data import DataLoader
-    collate_fn = None
-    if cfg.get("collate_fn", False):
-        collate_fn = get_function(cfg["collate_fn"])
-
-    dataloader = DataLoader(dataset=dataset, collate_fn=collate_fn, **cfg['args'])
-    return dataloader

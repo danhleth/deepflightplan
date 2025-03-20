@@ -1,1 +1,0 @@
-from dioscuri.base.metrics import METRIC_REGISTRY
