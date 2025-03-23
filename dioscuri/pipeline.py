@@ -4,6 +4,8 @@ import yaml
 import pandas as pd
 from pathlib import Path
 from tqdm import tqdm
+import time
+
 
 from dioscuri.opt import Opts
 
@@ -72,24 +74,23 @@ class Pipeline:
             if closest_origin is None or closest_destination is None:
                 continue
 
-            # Get the route
-            route = algorithm.astar_path(graph_dataset.G, closest_origin.name, closest_destination.name, weight="distance")
-            if route is None:
+            # Get the top_k_shortest_path
+            top_k_paths = algorithm.top_k_shortest_path(graph_dataset.G, closest_origin.name, closest_destination.name, weight="distance")
+            if top_k_paths is None:
                 continue
-            
             # Get the total distance
             # total_distance = sum([graph_dataset[route[i]][route[i+1]]["distance"] for i in range(len(route)-1)])
             # total_distances.append(total_distance)
-            cost = get_path_cost(graph_dataset.G, route)
-
-            # Track results
-            origin_airports.append(origin)
-            destination_airports.append(destination)
-            min_dist_dests.append(min_dist_dest)
-            min_dist_origins.append(min_dist_origin)
-            routes.append(' '.join(route))
-            route_distances.append(cost)
-            total_distances.append((cost+min_dist_origin+min_dist_dest))
+            for route in top_k_paths:
+                cost = get_path_cost(graph_dataset.G, route)
+                # Track results
+                origin_airports.append(origin)
+                destination_airports.append(destination)
+                min_dist_dests.append(min_dist_dest)
+                min_dist_origins.append(min_dist_origin)
+                routes.append(' '.join(route))
+                route_distances.append(cost)
+                total_distances.append((cost+min_dist_origin+min_dist_dest))
         
         df_results = pd.DataFrame(dict(origin=origin_airports, 
                                        destination=destination_airports,
