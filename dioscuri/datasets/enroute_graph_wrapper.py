@@ -65,7 +65,6 @@ def find_closest_node(graph, src_node: WaypointNode, criterion, threshold=float(
     """
     Find the closest node in the graph to the source node
     """
-
     closest_node = None
     min_distance = float('inf')
     for node in graph:
@@ -76,4 +75,20 @@ def find_closest_node(graph, src_node: WaypointNode, criterion, threshold=float(
         if distance < min_distance and distance < threshold:
             min_distance = distance
             closest_node = tmp_node
-    return closest_node, min_distance
+    return [closest_node, min_distance]
+
+
+def find_k_closest_node(graph, src_node: WaypointNode, criterion, k=1, threshold=float('inf')):
+    """
+    Find the k closest node in the graph to the source node
+    """
+    rs = []
+    for node in graph:
+        tmp_node = WaypointNode(lat=graph.nodes[node]['lat'], 
+                                long=graph.nodes[node]['long'],
+                                name=node)
+        distance = criterion.compute_distance(src_node, tmp_node)
+        if distance < threshold:
+            rs.append([tmp_node, distance])
+    rs = sorted(rs, key=lambda x: x[1])
+    return rs[:k]

@@ -13,3 +13,5 @@ dependencies:
     - einops
     - geopy
     - networkx[default]
+    - tabulate
+    - geojson

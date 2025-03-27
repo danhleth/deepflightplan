@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from dioscuri.utils.loading import load_yaml
+from dioscuri.utils.path import increment_path
 
 
 class Config(dict):
@@ -73,8 +74,10 @@ class Opts(ArgumentParser):
 
         config = Config(args.config)
         config = self.override(config, args.opt)
-        output_name = f'{datetime.now().strftime("%Y_%m_%d-%H_%M_%S")}'
-        save_path = Path(config["opt"]["save_dir"]) / output_name
+        # output_name = f'{datetime.now().strftime("%Y_%m_%d-%H_%M_%S")}'
+        # save_path = Path(config["opt"]["save_dir"]) / output_name
+        output_name = 'exp'
+        save_path = increment_path(Path(config["opt"]["save_dir"]) / output_name, mkdir=True)
         config["opt"]["save_dir"] = save_path
         print(f"The output will be saved to {save_path}")
         return config
