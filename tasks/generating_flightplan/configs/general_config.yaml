@@ -1,19 +1,24 @@
 opt:
   save_dir: runs
   seed: 123
+  k_closest_node_from_airport: 10
+  num_processes: 32
 
 data:
   datasource:
     args:
-      file_path: /home/danhle/AIATFM/data_preparation/deepflightplan/datasets/lido21/enroute_airway.geojson
+      file_path: /path_to_file/enroute_airway.geojson
     name: Lido21EnrouteAirwayDataset
   od_dataset:
     args:
-      file_path: /home/danhle/AIATFM/data_preparation/deepflightplan/datasets/od_pair/od_pair.csv
+      file_path: /path_to_file/od_pair2.csv
     name: ODAirportDataset
 
 criterion:
   name: GeopyGreatCircleDistance
 
 algorithm:
-    name: nxAstar
+    name: nxYen
+    args:
+      top_k: 100
+      weights: ['distance'] # ['distance', 'time']
