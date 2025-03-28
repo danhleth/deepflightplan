@@ -1,0 +1,1 @@
+python tasks/generating_flightplan/run.py -c tasks/generating_flightplan/configs/general_config.yaml

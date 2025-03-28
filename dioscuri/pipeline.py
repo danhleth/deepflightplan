@@ -231,12 +231,14 @@ class Pipeline:
         for i, tmp_df in enumerate(results):
             df_results = pd.concat([df_results, tmp_df], axis=0)
 
+
+        self.logger.info(f"There are {len(df_results)} flight plans synthesized")
         # Save final results
         if not df_results.empty:
             save_dir = Path(self.opt["save_dir"])
             save_dir.mkdir(parents=True, exist_ok=True)
             df_results.to_csv(save_dir / "flightplan_final.csv", index=False)
-
+            
         return df_results
     
     def fit(self):

@@ -7,11 +7,11 @@ opt:
 data:
   datasource:
     args:
-      file_path: /path_to_file/enroute_airway.geojson
+      file_path: datasets/lido21/pseudo_enroute_airway.geojson
     name: Lido21EnrouteAirwayDataset
   od_dataset:
     args:
-      file_path: /path_to_file/od_pair2.csv
+      file_path: datasets/od_pair/pseudo_od_pair.csv
     name: ODAirportDataset
 
 criterion:
