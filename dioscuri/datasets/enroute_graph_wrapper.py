@@ -16,6 +16,9 @@ class WaypointNode():
         self.type = type
         self.name = name
 
+    def __str__(self):
+        return f"{self.name} {self.icao} ({self.lat}, {self.long}) {self.type}"
+
 class EnrouteAirway():
     def __init__(self, start_node=None, 
                         end_node=None, 

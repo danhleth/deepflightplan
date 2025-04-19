@@ -14,8 +14,11 @@ data:
       file_path: datasets/od_pair/pseudo_od_pair.csv
     name: ODAirportDataset
 
-criterion:
+distance:
   name: GeopyGreatCircleDistance
+
+metric:
+  name: Hausdorff
 
 algorithm:
     name: nxYen

@@ -67,6 +67,31 @@ class Lido21EnrouteAirwayDataset():
                     route_indent=props['route_ident'])
         return self.G
     
+    def get_nodes(self, node_name):
+        """
+        Get specific node attributes
+        """
+        if self.G is None:
+            raise ValueError("Graph not initialized. Please load the graph first.")
+        
+        if self.G.has_node(node_name):
+            node_data = self.G.nodes[node_name]
+            return node_data
+        return None
+    
+    def get_list_nodes_np(self, node_names: List[str]) -> Iterable:
+        """
+        Get a list of nodes from the graph
+        """
+        if self.G is None:
+            raise ValueError("Graph not initialized. Please load the graph first.")
+        
+        nodes = []
+        for node_name in node_names.split():
+            if self.G.has_node(node_name):
+                node_data = self.G.nodes[node_name]
+                nodes.append([node_data['lat'], node_data['long']])
+        return np.array(nodes)
 
 class ODAirportDataset():
     def __init__(self, file_path: str):
