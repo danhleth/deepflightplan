@@ -32,7 +32,7 @@ def route_to_sector_with_count_waypoint(route: str) -> str:
     # Join all parts into a single string without separators
     return '-'.join(result)
 
-def route_to_sector_unqiue(route: str) -> str:
+def route_to_sector_unique(route: str) -> str:
     # Split the route into segments
     segments = route.split()
     # Handle empty input
@@ -124,14 +124,14 @@ def process_single_od(args):
         route=tmp_routes
     ))
     
-    sector_with_count_waypoint = tmp_df["route"].apply(route_to_sector_with_count_waypoint)
-    tmp_df["sector_with_count_waypoint"] = sector_with_count_waypoint
-    count_unique_sectors = tmp_df["route"].apply(lambda x: len(route_to_sector_unqiue(x).split("-")))
-    tmp_df["count_unique_sector"] = count_unique_sectors
+    # sector_with_count_waypoint = tmp_df["route"].apply(route_to_sector_with_count_waypoint)
+    # tmp_df["sector_with_count_waypoint"] = sector_with_count_waypoint
+    # count_unique_sectors = tmp_df["route"].apply(lambda x: len(route_to_sector_unqiue(x).split("-")))
+    # tmp_df["count_unique_sector"] = count_unique_sectors
 
-    tmp_df = filter_routes(tmp_df)
+    # tmp_df = filter_routes(tmp_df)
     # Logic filter for the top k shortest path by heuristics
-    tmp_df = tmp_df.sort_values(by=["total_distances", "count_unique_sector"]).iloc[:algorithm.top_k]
+    # tmp_df = tmp_df.sort_values(by=["total_distances", "count_unique_sector"]).iloc[:algorithm.top_k]
 
     return tmp_df
 

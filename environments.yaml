@@ -7,7 +7,6 @@ dependencies:
   - pandas
   - tqdm
   - matplotlib
-  - pyyaml
   - pip
   - pip:
     - einops
@@ -15,3 +14,5 @@ dependencies:
     - networkx[default]
     - tabulate
     - geojson
+    - PyYAML
+    - joblib
