@@ -64,7 +64,7 @@ def process_single_od(args):
     """
     # Unpack arguments
     index, row, algorithm, distance, graph_dataset, opt = args
-    origin, destination, aircraft_range, org_lat, org_long, dest_lat, dest_long = row
+    origin, destination, aircraft_range, org_lat, org_long, dest_lat, dest_long, aircraft_speed = row
     
     # Create waypoint nodes
     org_node = WaypointNode(lat=org_lat, long=org_long, name=origin, type=WaypointType.AIRPORT)
@@ -90,6 +90,7 @@ def process_single_od(args):
     tmp_routes = []
     tmp_route_distances = []
     tmp_total_distances = []
+    tmp_aircraft_speeds = []
 
     # Process each combination
     for (min_node_origin, min_dist_origin), (min_node_dest, min_dist_dest) in combinations:
@@ -112,6 +113,7 @@ def process_single_od(args):
             tmp_routes.append(' '.join(route))
             tmp_route_distances.append(cost)
             tmp_total_distances.append(cost + min_dist_origin + min_dist_dest)
+            tmp_aircraft_speeds.append(aircraft_speed)
 
     # Create DataFrame for this OD pair
     tmp_df = pd.DataFrame(dict(
@@ -121,13 +123,15 @@ def process_single_od(args):
         min_dist_dest=tmp_min_dist_dests,
         route_distances=tmp_route_distances,
         total_distances=tmp_total_distances,
+        aircraft_speed_mph=tmp_aircraft_speeds,
         route=tmp_routes
     ))
     
-    # sector_with_count_waypoint = tmp_df["route"].apply(route_to_sector_with_count_waypoint)
-    # tmp_df["sector_with_count_waypoint"] = sector_with_count_waypoint
-    # count_unique_sectors = tmp_df["route"].apply(lambda x: len(route_to_sector_unqiue(x).split("-")))
-    # tmp_df["count_unique_sector"] = count_unique_sectors
+    sector_with_count_waypoint = tmp_df["route"].apply(route_to_sector_with_count_waypoint)
+    tmp_df["sector_with_count_waypoint"] = sector_with_count_waypoint
+    count_unique_sectors = tmp_df["route"].apply(lambda x: len(route_to_sector_unique(x).split("-")))
+    tmp_df["count_unique_sector"] = count_unique_sectors
+    tmp_df['reformatted_route'] = tmp_df["route"].apply(lambda x: reformat_synthesized_route(x, graph_dataset))
 
     # tmp_df = filter_routes(tmp_df)
     # Logic filter for the top k shortest path by heuristics
@@ -170,3 +174,37 @@ def eval_single_od(od_group, graph_dataset, distance_fn, metric_fn):
             continue
         rs.append(haursdorff_distance)
     return rs
+
+
+def reformat_synthesized_route(synthesized_route, enroute_graph):
+    """
+    Reformat the synthesized route to match the format of the enroute graph.
+    """
+    synthesized_route = synthesized_route.split()
+    
+    reformatted_route = []
+    previous_route_ident = None
+    for i in range(len(synthesized_route)-1):
+        node1 = synthesized_route[i] if enroute_graph.hidden_sectors == False else synthesized_route[i].split("-")[1]
+        node2 = synthesized_route[i+1] if enroute_graph.hidden_sectors == False else synthesized_route[i+1].split("-")[1]
+        edges = enroute_graph.G.get_edge_data(node1,node2)
+        if edges is None:
+            continue
+        
+        reformatted_route.append(node1)
+        current_route_ident = edges['route_ident']
+        if previous_route_ident != current_route_ident:
+            reformatted_route.append(current_route_ident)
+            previous_route_ident = current_route_ident
+        reformatted_route.append(node2)
+
+    # Example ['POVOT', 'M774', 'KEONG', 'KEONG', 'W44', 'ELBAM', 'ELBAM', 'BLI', 'BLI', 'W33', 'GOMAT', 'GOMAT', 'NR', 'NR', 'W43', 'KPG']
+    # Now remove the duplicates neighboring nodes
+    reformatted_route = [reformatted_route[i] for i in range(len(reformatted_route)) if i == 0 or reformatted_route[i] != reformatted_route[i-1]]
+    return " ".join(reformatted_route)
+    return "huh"
+
+# tmp_synthesized_route = "WA-POVOT WA-KEONG WA-ELBAM WA-BLI WA-GOMAT WA-NR WA-KPG"
+# reformatted_route = reformat_synthesized_route(synthesized_route=tmp_synthesized_route, enroute_graph=enroute_graph)
+# _, reformatted_synthesized_route_np = route_to_numpy_coordinates(reformatted_route,enroute_graph)
+# print(reformatted_route)

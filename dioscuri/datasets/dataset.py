@@ -9,12 +9,13 @@ import geojson
 
 
 class Lido21EnrouteAirwayDataset():
-    def __init__(self, file_path: str, hiden_sectors: bool = False):
+    def __init__(self, file_path: str, hidden_sectors: bool = False):
         # Initialize directed graph
         self.G = None
-        self.G = self.load_geojson(file_path, hiden_sectors)
+        self.G = self.load_geojson(file_path, hidden_sectors)
+        self.hidden_sectors = hidden_sectors
 
-    def load_geojson(self, geojson_data, hiden_sectors: bool = False):
+    def load_geojson(self, geojson_data, hidden_sectors: bool = False):
         """
         Create a directed graph from GeoJSON route data
         Returns: NetworkX DiGraph object
@@ -38,7 +39,7 @@ class Lido21EnrouteAirwayDataset():
             props = feature['properties']
             
             # Get node identifiers
-            if hiden_sectors == False:
+            if hidden_sectors == False:
                 start_node = f"{props['fix0_icao']}-{props['fix0_ident']}"
                 end_node = f"{props['fix1_icao']}-{props['fix1_ident']}"
             else:
