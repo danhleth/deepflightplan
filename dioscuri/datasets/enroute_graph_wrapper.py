@@ -1,7 +1,6 @@
 import networkx as nx
 from geopy import distance
 
-
 class WaypointType():
     AIRPORT = "airport"
     ENROUTE = "enroute"
@@ -46,52 +45,3 @@ class Route():
     def get_route(self):
         return self.list_of_nodes
     
-
-def get_path_cost(graph, calculate_path):
-    """
-    Calculate the total distance of the shortest path between two nodes
-    Returns: tuple of (path, total_distance) or (None, None) if no path exists
-    """
-    try:
-        # Calculate total distance
-        total_distance = 0
-        for i in range(len(calculate_path) - 1):
-            total_distance += graph[calculate_path[i]][calculate_path[i+1]]['distance']
-            
-        return total_distance
-    
-    except nx.NetworkXNoPath:
-        return None
-    
-
-def find_closest_node(graph, src_node: WaypointNode, criterion, threshold=float('inf')):
-    """
-    Find the closest node in the graph to the source node
-    """
-    closest_node = None
-    min_distance = float('inf')
-    for node in graph:
-        tmp_node = WaypointNode(lat=graph.nodes[node]['lat'], 
-                                long=graph.nodes[node]['long'],
-                                name=node)
-        distance = criterion.compute_distance(src_node, tmp_node)
-        if distance < min_distance and distance < threshold:
-            min_distance = distance
-            closest_node = tmp_node
-    return [closest_node, min_distance]
-
-
-def find_k_closest_node(graph, src_node: WaypointNode, criterion, k=1, threshold=float('inf')):
-    """
-    Find the k closest node in the graph to the source node
-    """
-    rs = []
-    for node in graph:
-        tmp_node = WaypointNode(lat=graph.nodes[node]['lat'], 
-                                long=graph.nodes[node]['long'],
-                                name=node)
-        distance = criterion.compute_distance(src_node, tmp_node)
-        if distance < threshold:
-            rs.append([tmp_node, distance])
-    rs = sorted(rs, key=lambda x: x[1])
-    return rs[:k]
