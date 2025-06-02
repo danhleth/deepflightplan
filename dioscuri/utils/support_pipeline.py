@@ -12,7 +12,7 @@ import re
 import os
 import folium
 import math
-
+import json
 
 def route_to_sector_with_count_waypoint(route: str) -> str:
     """ 
@@ -90,6 +90,52 @@ def find_corresponding_airport(airport_df, airport_code):
         raise ValueError(f"Airport code {airport_code} not found in the airport DataFrame.")
 
 
+def filter_sector_by_name(geojson_data, sector_names: list):
+    """
+    Filter GeoJSON data to return only the sector with the specified name.
+
+    Parameters:
+    - geojson_data (dict): GeoJSON data containing multiple sectors.
+    - sector_name (str): Name of the sector to filter.
+
+    Returns:
+    - dict: Filtered GeoJSON data containing only the specified sector.
+    """
+    if not isinstance(geojson_data, dict) or geojson_data.get('type') != 'FeatureCollection':
+        raise ValueError("Invalid GeoJSON data format. Expected a FeatureCollection.")
+
+    filtered_features = []
+    for feature in geojson_data['features']:
+        for sector_name in sector_names:
+            if feature['properties'].get('index') == sector_name:
+                filtered_features.append(feature)
+
+    if not filtered_features:
+        raise ValueError(f"Sector with name '{sector_names}' not found in the GeoJSON data.")
+
+    return {
+        'type': 'FeatureCollection',
+        'features': filtered_features
+    }
+    
+def load_geojson(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            geojson_data = json.load(f)
+        if geojson_data['type'] != 'FeatureCollection':
+            raise ValueError("GeoJSON must be a FeatureCollection")
+        return geojson_data
+    except FileNotFoundError:
+        print(f"Error: File {file_path} not found")
+        return None
+    except json.JSONDecodeError:
+        print(f"Error: Invalid JSON format in {file_path}")
+        return None
+    except Exception as e:
+        print(f"Error loading GeoJSON: {str(e)}")
+        return None
+    
+
 def visualize_routes(df, enroute_graph):
     origin = df['origin'].iloc[0]
     destination = df['destination'].iloc[0]
@@ -106,12 +152,28 @@ def visualize_routes(df, enroute_graph):
 
     m = folium.Map(location=[center_lat, center_lon], zoom_start=4)
 
-    folium.GeoJson('/Users/danhleth/Projects/AIATFM/deepflightplan/datasets/lido21/enroute_airway.geojson', name='GeoJSON').add_to(m)
+    folium.GeoJson('/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/lido21/enroute_airway.geojson', 
+                   name='EnrouteAirway').add_to(m)
+    
+    sector_data = load_geojson("/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/facilities/sectors.geojson")
+    names = ["WSJCE", "WSJCH", "WSJCG", "WSJCF", "WSJCC", "WSJCD", "WSJCB", "WSJCA"]
+
+    sector_data = filter_sector_by_name(sector_data, names)
+    folium.GeoJson(sector_data, 
+                   style_function=lambda feature: {
+                        "fillColor": "#ffff00",
+                        "color": "black",
+                        "weight": 2,
+                        "dashArray": "5, 5",
+                    },
+                   name='Sector').add_to(m)
+
     folium.Marker(
         location=origin_coords,
         popup=origin,
         icon=folium.Icon(color='green', icon='plane-departure', prefix='fa')
     ).add_to(m)
+
     folium.Marker(
         location=destination_coords,
         popup=destination,
@@ -119,13 +181,20 @@ def visualize_routes(df, enroute_graph):
     ).add_to(m)
 
     for idx, row in df.iterrows():
-        synth_coords = row['route_np']
+
+        synth_coords = np.array(row['route_np'])
         origin = row['origin']
         destination = row['destination']
 
-        synth_coords.insert(0, origin_coords)  # Insert origin at the start
-        synth_coords.append(destination_coords)
+        synth_coords = np.insert(synth_coords, 0, np.array([origin_lat, origin_lon]), axis=0)  # Insert origin at the start
+        synth_coords = np.insert(synth_coords, len(synth_coords), np.array([destination_lat, destination_lon]), axis=0)  # Append destination at the end
 
+        # remove nan values in synth_coords
+        synth_coords = synth_coords[~np.isnan(synth_coords).any(axis=1)]
+        if len(synth_coords) < 2:
+            print(f"Skipping route {idx+1} for {origin} to {destination} due to insufficient coordinates.")
+            continue
+        
         # Plot real route (blue)
         folium.PolyLine(
             locations=synth_coords,
@@ -291,9 +360,11 @@ def process_single_od(args):
     tmp_df = tmp_df[:algorithm.retrieve_j]
     saved_synthesized_route_path = opt['save_dir']/ 'saved_synthesized_routes'
     saved_synthesized_route_path.mkdir(parents=True, exist_ok=True)
-   
     if tmp_df.empty:
         return tmp_df
+    tmp_df = tmp_df.drop_duplicates(subset=['carrier_code', 'flight_number', 'utc_dep_time', 'origin', 'destination', \
+                                            'route_distances', 'total_distances', 'aircraft_speed_mph', 'aircraft_range', \
+                                            'route_flying_time', 'total_flying_time'], keep='first')
     origin = tmp_df['origin'].iloc[0]
     destination = tmp_df['destination'].iloc[0]
     m = visualize_routes(tmp_df, graph_datasource)
@@ -499,4 +570,6 @@ def parse_routestr_to_np(route_str):
         return route_array
     except Exception as e:
         print(f"Error parsing route: {e}")
+        print(f"Original route string: {route_str}")
+        # Return a default array if parsing fails
         return np.array([[np.nan, np.nan]])

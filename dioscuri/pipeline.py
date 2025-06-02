@@ -50,6 +50,8 @@ class Pipeline:
         self.logger = self._init_logging(log_file=save_dir / "log.txt", name="logger")
         self.logger.info(self.opt)
         self.logger.info(self.cfg_algorithm)
+
+
     def _init_logging(self, log_file='log.txt', name='logger'):
         """ Initialize logging
         """
@@ -82,14 +84,14 @@ class Pipeline:
         Generate flight routes using multiprocessing 
         """
         #### PROCEDURE PROCESSING - FOR DEBUGGING PURPOSE ####
-        df_results = pd.DataFrame()
-        for index, row in tqdm(od_airport_dataset.df.iterrows(), total=len(od_airport_dataset.df)):
-            args = (index, row, algorithm, distance, graph_datasource, self.opt, self.logger)
-            tmp_df = process_single_od(args)
+        # df_results = pd.DataFrame()
+        # for index, row in tqdm(od_airport_dataset.df.iterrows(), total=len(od_airport_dataset.df)):
+        #     args = (index, row, algorithm, distance, graph_datasource, self.opt, self.logger)
+        #     tmp_df = process_single_od(args)
             
-            if tmp_df is not None and not tmp_df.empty:
-                df_results = pd.concat([df_results, tmp_df], axis=0)
-        return df_results
+        #     if tmp_df is not None and not tmp_df.empty:
+        #         df_results = pd.concat([df_results, tmp_df], axis=0)
+        # return df_results
 
 
         #### PARALLEL PROCESSING ####
