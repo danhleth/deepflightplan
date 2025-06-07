@@ -82,14 +82,14 @@ class Pipeline:
         Generate flight routes using multiprocessing 
         """
         #### PROCEDURE PROCESSING - FOR DEBUGGING PURPOSE ####
-        df_results = pd.DataFrame()
-        for index, row in tqdm(od_airport_dataset.df.iterrows(), total=len(od_airport_dataset.df)):
-            args = (index, row, algorithm, distance, graph_datasource, self.opt, self.logger)
-            tmp_df = process_single_od(args)
+        # df_results = pd.DataFrame()
+        # for index, row in tqdm(od_airport_dataset.df.iterrows(), total=len(od_airport_dataset.df)):
+        #     args = (index, row, algorithm, distance, graph_datasource, self.opt, self.logger)
+        #     tmp_df = process_single_od(args)
             
-            if tmp_df is not None and not tmp_df.empty:
-                df_results = pd.concat([df_results, tmp_df], axis=0)
-        return df_results
+        #     if tmp_df is not None and not tmp_df.empty:
+        #         df_results = pd.concat([df_results, tmp_df], axis=0)
+        # return df_results
 
 
         #### PARALLEL PROCESSING ####
@@ -113,7 +113,7 @@ class Pipeline:
             if tmp_df is not None and not tmp_df.empty:
                 df_results = pd.concat([df_results, tmp_df], axis=0)
 
-        # for od_key, od_group_df in df_results.groupby(['carrier_code', 'flight_number','origin', 'destination']):
+        # for od_key, od_group_df in df_results.groupby(['carrier_code', 'flight_number','origin', 'destination', 'utc_dep_time']):
                 # save_dir = Path(self.opt["save_dir"]) / "OD-SynthesizedFlightRoute" 
                 # save_dir.mkdir(parents=True, exist_ok=True)
                 # filename = str("-".join(od_key))
@@ -128,7 +128,7 @@ class Pipeline:
         self.logger.info(f"Evaluating {len(df)} flight plans")
 
         # Group the DataFrame by 'origin' and 'destination'
-        groups_od = df.groupby(['origin', 'destination'])
+        groups_od = df.groupby(['carrier_code', 'flight_number','origin', 'destination', 'utc_dep_time'])
 
         ## PROCESSING - FOR DEBUGGING PURPOSE ###
         # Process results and save to CSV
@@ -192,7 +192,7 @@ class Pipeline:
 
     def filtering_logic(self, df, graph_datasource, algorithm):
         self.logger.info("Filtering flight plans based on the filtering logic")
-        od_group = df.groupby(['carrier_code', 'flight_number','origin', 'destination'])
+        od_group = df.groupby(['carrier_code', 'flight_number','origin', 'destination', 'utc_dep_time'])
         top_k = algorithm.top_k if hasattr(algorithm, 'top_k') else 10
         
         combined_df = pd.DataFrame()
