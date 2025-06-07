@@ -118,7 +118,10 @@ def filter_sector_by_name(geojson_data, sector_names: list):
         'features': filtered_features
     }
     
+<<<<<<< HEAD
     
+=======
+>>>>>>> 4fa38b0577075bdf3296de5dfde71b1fafed314a
 def load_geojson(file_path):
     try:
         with open(file_path, 'r') as f:
@@ -153,6 +156,7 @@ def visualize_routes(df, enroute_graph):
 
     m = folium.Map(location=[center_lat, center_lon], zoom_start=4)
 
+<<<<<<< HEAD
     folium.GeoJson('/Users/danhleth/Projects/AIATFM/deepflightplan/datasets/lido21/enroute_airway.geojson', 
                    name='EnrouteAirway').add_to(m)
     
@@ -160,6 +164,15 @@ def visualize_routes(df, enroute_graph):
     # names = ["WSJCE", "WSJCH", "WSJCG", "WSJCF", "WSJCC", "WSJCD", "WSJCB", "WSJCA"]
 
     # sector_data = filter_sector_by_name(sector_data, names)
+=======
+    folium.GeoJson('/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/lido21/enroute_airway.geojson', 
+                   name='EnrouteAirway').add_to(m)
+    
+    sector_data = load_geojson("/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/facilities/sectors.geojson")
+    names = ["WSJCE", "WSJCH", "WSJCG", "WSJCF", "WSJCC", "WSJCD", "WSJCB", "WSJCA"]
+
+    sector_data = filter_sector_by_name(sector_data, names)
+>>>>>>> 4fa38b0577075bdf3296de5dfde71b1fafed314a
     folium.GeoJson(sector_data, 
                    style_function=lambda feature: {
                         "fillColor": "#ffff00",
@@ -168,7 +181,11 @@ def visualize_routes(df, enroute_graph):
                         "dashArray": "5, 5",
                     },
                    name='Sector').add_to(m)
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> 4fa38b0577075bdf3296de5dfde71b1fafed314a
     folium.Marker(
         location=origin_coords,
         popup=origin,
@@ -572,4 +589,6 @@ def parse_routestr_to_np(route_str):
         return route_array
     except Exception as e:
         print(f"Error parsing route: {e}")
+        print(f"Original route string: {route_str}")
+        # Return a default array if parsing fails
         return np.array([[np.nan, np.nan]])

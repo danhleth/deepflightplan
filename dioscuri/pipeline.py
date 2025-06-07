@@ -50,6 +50,8 @@ class Pipeline:
         self.logger = self._init_logging(log_file=save_dir / "log.txt", name="logger")
         self.logger.info(self.opt)
         self.logger.info(self.cfg_algorithm)
+
+
     def _init_logging(self, log_file='log.txt', name='logger'):
         """ Initialize logging
         """
