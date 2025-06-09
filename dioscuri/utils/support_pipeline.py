@@ -118,10 +118,6 @@ def filter_sector_by_name(geojson_data, sector_names: list):
         'features': filtered_features
     }
     
-<<<<<<< HEAD
-    
-=======
->>>>>>> 4fa38b0577075bdf3296de5dfde71b1fafed314a
 def load_geojson(file_path):
     try:
         with open(file_path, 'r') as f:
@@ -156,23 +152,14 @@ def visualize_routes(df, enroute_graph):
 
     m = folium.Map(location=[center_lat, center_lon], zoom_start=4)
 
-<<<<<<< HEAD
-    folium.GeoJson('/Users/danhleth/Projects/AIATFM/deepflightplan/datasets/lido21/enroute_airway.geojson', 
+    dataset_path = "/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets"
+    folium.GeoJson(f'{dataset_path}/lido21/enroute_airway.geojson', 
                    name='EnrouteAirway').add_to(m)
     
-    sector_data = load_geojson("/Users/danhleth/Projects/AIATFM/deepflightplan/datasets/facilities/sectors.geojson")
+    sector_data = load_geojson(f"{dataset_path}/facilities/sectors.geojson")
     # names = ["WSJCE", "WSJCH", "WSJCG", "WSJCF", "WSJCC", "WSJCD", "WSJCB", "WSJCA"]
 
     # sector_data = filter_sector_by_name(sector_data, names)
-=======
-    folium.GeoJson('/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/lido21/enroute_airway.geojson', 
-                   name='EnrouteAirway').add_to(m)
-    
-    sector_data = load_geojson("/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/facilities/sectors.geojson")
-    names = ["WSJCE", "WSJCH", "WSJCG", "WSJCF", "WSJCC", "WSJCD", "WSJCB", "WSJCA"]
-
-    sector_data = filter_sector_by_name(sector_data, names)
->>>>>>> 4fa38b0577075bdf3296de5dfde71b1fafed314a
     folium.GeoJson(sector_data, 
                    style_function=lambda feature: {
                         "fillColor": "#ffff00",
@@ -181,11 +168,7 @@ def visualize_routes(df, enroute_graph):
                         "dashArray": "5, 5",
                     },
                    name='Sector').add_to(m)
-<<<<<<< HEAD
    
-=======
-
->>>>>>> 4fa38b0577075bdf3296de5dfde71b1fafed314a
     folium.Marker(
         location=origin_coords,
         popup=origin,
@@ -277,6 +260,7 @@ def process_single_od(args):
     """
     # Unpack arguments
     index, row, algorithm, distance, graph_datasource, opt, logger = args
+    # print(row)
     carrier_code, flight_number, specific_aircraft_code, origin, destination, org_lat, org_long, dest_lat, dest_long, utc_dep_time, flying_time, aircraft_range, aircraft_speed = row
     
     # Create waypoint nodes

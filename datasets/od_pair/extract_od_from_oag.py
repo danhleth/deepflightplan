@@ -236,13 +236,13 @@ def extract_oag_file(file_path, airport_file):
     od_df.to_csv('od_pair_oct_icao.csv', index=False)
 
 def main():
-    airport_file = "/Users/danhleth/Projects/AIATFM/deepflightplan/datasets/airports/iata-icao.csv"
-    oag_file = "/Users/danhleth/Projects/AIATFM/oag/ScheduleReport2024/Sch_AS_202410.zip"
-    sector_facilities_file = "/Users/danhleth/Projects/AIATFM/deepflightplan/datasets/facilities/sectors.geojson"
+    airport_file = "/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/airports/iata-icao.csv"
+    oag_file = "/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/oag/Sch_AS_202410_AL_JobId3339801.zip"
+    sector_facilities_file = "/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/facilities/sectors.geojson"
 
-    # extract_oag_file(oag_file, airport_file)
+    extract_oag_file(oag_file, airport_file)
 
-    df = pd.read_csv("/Users/danhleth/Projects/AIATFM/deepflightplan/datasets/od_pair/od_pair_oct_icao.csv")
+    df = pd.read_csv("/Users/danhle/Projects/ATMRI/AIATFM/data_preparation/deepflightplan/datasets/od_pair/od_pair_oct_icao.csv")
     sector_data = load_geojson(sector_facilities_file)
     crossing_flights = check_flights_crossing_sector(sector_data, df)
     if crossing_flights:
